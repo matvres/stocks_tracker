@@ -28,21 +28,21 @@ String del2 = "GD";
 String del3 = "PLTR";
 String del4 = "LMT";
 
-float val1 = 0.0;
-float val2 = 0.0;
-float val3 = 0.0;
-float val4 = 0.0;
+float val1 = 168.40;// when 23.1.2024 market closed
+float val2 = 249.34;
+float val3 = 17.34;
+float val4 = 439.49;
 
-float prev_val1 = 0.0;
-float prev_val2 = 0.0;
-float prev_val3 = 0.0;
-float prev_val4 = 0.0;
+float prev_val1 = 168.40;
+float prev_val2 = 249.34;
+float prev_val3 = 17.34;
+float prev_val4 = 439.49;
 
 boolean day_start = true;
-float fval1;
-float fval2;
-float fval3;
-float fval4;
+float fval1 = 168.40; 
+float fval2 = 249.34;
+float fval3 = 17.34;
+float fval4 = 439.49;
 
 float daily_change_perc = 0.0;
 
@@ -215,6 +215,32 @@ void lcd_display(){
       lcd.print(val2);
       lcd.setCursor(9,0);
       lcd.print("$");
+
+      daily_change_perc = ((val2 - fval2)/fval2)*100;
+      if(daily_change_perc >= 0){
+        lcd.setCursor(0,1);
+        lcd.print("+");
+        lcd.setCursor(1,1);
+        lcd.print(daily_change_perc);
+      }else{
+        lcd.setCursor(0,1);
+        lcd.print(daily_change_perc);
+      }
+      lcd.setCursor(6,1);
+      lcd.print("%");
+
+      change = val2 - prev_val2;
+      if(change >= 0){
+        lcd.setCursor(8,1);
+        lcd.print("+");
+        lcd.setCursor(9,1);
+        lcd.print(change);
+      }else{
+        lcd.setCursor(8,1);
+        lcd.print(change);
+      }
+      lcd.setCursor(15,1);
+      lcd.print("$");
       break;
     case 3:
       lcd.setCursor(0,0);
@@ -223,6 +249,32 @@ void lcd_display(){
       lcd.print(val3);
       lcd.setCursor(10,0);
       lcd.print("$");
+
+      daily_change_perc = ((val3 - fval3)/fval3)*100;
+      if(daily_change_perc >= 0){
+        lcd.setCursor(0,1);
+        lcd.print("+");
+        lcd.setCursor(1,1);
+        lcd.print(daily_change_perc);
+      }else{
+        lcd.setCursor(0,1);
+        lcd.print(daily_change_perc);
+      }
+      lcd.setCursor(6,1);
+      lcd.print("%");
+
+      change = val3 - prev_val3;
+      if(change >= 0){
+        lcd.setCursor(8,1);
+        lcd.print("+");
+        lcd.setCursor(9,1);
+        lcd.print(change);
+      }else{
+        lcd.setCursor(8,1);
+        lcd.print(change);
+      }
+      lcd.setCursor(15,1);
+      lcd.print("$");
       break;
     case 4:
       lcd.setCursor(0,0);
@@ -230,6 +282,32 @@ void lcd_display(){
       lcd.setCursor(4,0);
       lcd.print(val4);
       lcd.setCursor(10,0);
+      lcd.print("$");
+
+      daily_change_perc = ((val4 - fval4)/fval4)*100;
+      if(daily_change_perc >= 0){
+        lcd.setCursor(0,1);
+        lcd.print("+");
+        lcd.setCursor(1,1);
+        lcd.print(daily_change_perc);
+      }else{
+        lcd.setCursor(0,1);
+        lcd.print(daily_change_perc);
+      }
+      lcd.setCursor(6,1);
+      lcd.print("%");
+
+      change = val4 - prev_val4;
+      if(change >= 0){
+        lcd.setCursor(8,1);
+        lcd.print("+");
+        lcd.setCursor(9,1);
+        lcd.print(change);
+      }else{
+        lcd.setCursor(8,1);
+        lcd.print(change);
+      }
+      lcd.setCursor(15,1);
       lcd.print("$");
       break;
   }

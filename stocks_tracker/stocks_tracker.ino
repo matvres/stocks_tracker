@@ -1,3 +1,5 @@
+#include <NTPClient.h>
+#include <WiFiUdp.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <ESP8266HTTPClient.h>
@@ -27,9 +29,15 @@ char c = 'a';
 
 WiFiClientSecure client;
 HTTPClient https;
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
+
+int stock_market_opens = 1530;
+int stock_market_closes = 2200;
+int current_time = 0;
 
 // Timing
-long interval = 3000;
+long interval = 120000;
 unsigned long previousMillis = 0;
 unsigned long currentMillis;
 
@@ -51,6 +59,8 @@ void setup() {
     delay(1000);
   }
 
+  timeClient.begin();
+
   // Set time via NTP, as required for x.509 validation
   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
 
@@ -70,49 +80,59 @@ void setup() {
 
 void loop() {
 
+  timeClient.update();
+  //Serial.println(timeClient.getFormattedTime());
+  //Serial.println(timeClient.getHours()*100 + timeClient.getMinutes());
+  current_time = timeClient.getHours()*100 + timeClient.getMinutes();
+
+  currentMillis = millis();
+
   // wait for WiFi connection
   if ((WiFi.status() == WL_CONNECTED)) {
 
     client.setTrustAnchors(&cert);
 
-    // Serial.print("[HTTPS] begin...\n");
-    if (https.begin(client, "https://api.twelvedata.com/price?symbol=AMD,GD,PLTR,LMT&dp=2&apikey=9d5aabf6c0224949b69be96a2a53ab93")) {
+    // Speed of requesting data from the website: every 2mins between 15:28 and 22:00 (market open hours) +1 because UTC-0
+    if(((currentMillis - previousMillis) > interval) && (current_time >= 1628) && (current_time <= 2300)){
+      
+      previousMillis = currentMillis;
 
-      // Serial.print("[HTTPS] GET...\n");
-      // Start connection and send HTTP header
-      int httpCode = https.GET();
+      // Serial.print("[HTTPS] begin...\n");
+      if (https.begin(client, "https://api.twelvedata.com/price?symbol=AMD,GD,PLTR,LMT&dp=2&apikey=9d5aabf6c0224949b69be96a2a53ab93")) {
 
-      // httpCode will be negative on error
-      if (httpCode > 0) {
-        // HTTP header has been send and Server response header has been handled
-        // Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
-        // Serial.println(https.getString());
+        // Serial.print("[HTTPS] GET...\n");
+        // Start connection and send HTTP header
+        int httpCode = https.GET();
 
-        // Data found at server
-        if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
+        // httpCode will be negative on error
+        if (httpCode > 0) {
+          // HTTP header has been send and Server response header has been handled
+          // Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
+          // Serial.println(https.getString());
 
-          String market_data = https.getString();
+          // Data found at server
+          if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
 
-          // Sends market_data via serial channel:
-          for(int i = 0; i < strlen((market_data).c_str()); i++ ) {
-            c = market_data[i];
-            Serial.write(c);
+            String market_data = https.getString();
+
+            // Sends market_data via serial channel:
+            for(int i = 0; i < strlen((market_data).c_str()); i++ ) {
+              c = market_data[i];
+              Serial.write(c);
+            }
+            Serial.write('\n');
+
+            
           }
-          Serial.write('\n');
-
-          
+        } else {
+          Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
         }
+
+        https.end();
       } else {
-        Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
+        Serial.printf("[HTTPS] Unable to connect\n");
       }
-
-      https.end();
-    } else {
-      Serial.printf("[HTTPS] Unable to connect\n");
+  
     }
-
-    // Speed of requesting data from the website in miliseconds
-    delay(120000);
-    
   }
 }
