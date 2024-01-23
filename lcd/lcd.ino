@@ -15,6 +15,8 @@ const byte rxPin = 2;
 const byte txPin = 3;
 SoftwareSerial comms_channels(rxPin,txPin);
 
+int a;
+
 // Timing za LCD šaltanje
 long interval = 2000;
 unsigned long previousMillis = 0;
@@ -26,10 +28,23 @@ String del2 = "GD";
 String del3 = "PLTR";
 String del4 = "LMT";
 
-float val1;
-float val2;
-float val3;
-float val4;
+float val1 = 0.0;
+float val2 = 0.0;
+float val3 = 0.0;
+float val4 = 0.0;
+
+float prev_val1 = 0.0;
+float prev_val2 = 0.0;
+float prev_val3 = 0.0;
+float prev_val4 = 0.0;
+
+boolean day_start = true;
+float fval1;
+float fval2;
+float fval3;
+float fval4;
+
+float daily_change_perc = 0.0;
 
 StaticJsonDocument<128> doc;
 boolean stringComplete = false;
@@ -112,29 +127,49 @@ void parseJson(){
 
     switch (j) {
       case 0:
+        prev_val1 = val1;
         val1 = item.value()["price"].as<float>();
+        if(day_start){
+          fval1 = val1;
+        }
         Serial.println(del1 + ":" + val1);
         break;
       case 1:
+        prev_val2 = val2;
         val2 = item.value()["price"].as<float>();
+        if(day_start){
+          fval2 = val2;
+        }
         Serial.println(del2 + ":" + val2);
         break;
       case 2:
+        prev_val3 = val3;
         val3 = item.value()["price"].as<float>();
         Serial.println(del3 + ":" + val3);
+        if(day_start){
+          fval3 = val3;
+        }
         break;
       case 3:
+        prev_val4 = val4;
         val4 = item.value()["price"].as<float>();
         Serial.println(del4 + ":" + val4);
+        if(day_start){
+          fval4 = val4;
+        }
         break;
     }
 
     j++;
     
   }
+
+  day_start = false;
 }
 
 void lcd_display(){
+
+  float change = 0.0;
 
   lcd.clear();
 
@@ -145,6 +180,32 @@ void lcd_display(){
       lcd.setCursor(4,0);
       lcd.print(val1);
       lcd.setCursor(10,0);
+      lcd.print("$");
+      
+      daily_change_perc = ((val1 - fval1)/fval1)*100;
+      if(daily_change_perc >= 0){
+        lcd.setCursor(0,1);
+        lcd.print("+");
+        lcd.setCursor(1,1);
+        lcd.print(daily_change_perc);
+      }else{
+        lcd.setCursor(0,1);
+        lcd.print(daily_change_perc);
+      }
+      lcd.setCursor(6,1);
+      lcd.print("%");
+      
+      change = val1 - prev_val1;
+      if(change >= 0){
+        lcd.setCursor(8,1);
+        lcd.print("+");
+        lcd.setCursor(9,1);
+        lcd.print(change);
+      }else{
+        lcd.setCursor(8,1);
+        lcd.print(change);
+      }
+      lcd.setCursor(15,1);
       lcd.print("$");
       break;
     case 2:
