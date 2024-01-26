@@ -92,13 +92,15 @@ void loop() {
 
     client.setTrustAnchors(&cert);
 
+    //Serial.println(current_time);
+
     // Speed of requesting data from the website: every 2mins between 15:28 and 22:00 (market open hours) +1 because UTC-0
-    if(((currentMillis - previousMillis) > interval) && (current_time >= 1628) && (current_time <= 2300)){
+    if(((currentMillis - previousMillis) > interval) && (current_time >= 1428) && (current_time <= 2200)){
       
       previousMillis = currentMillis;
 
       // Serial.print("[HTTPS] begin...\n");
-      if (https.begin(client, "https://api.twelvedata.com/price?symbol=AMD,GD,PLTR,LMT&dp=2&apikey=9d5aabf6c0224949b69be96a2a53ab93")) {
+      if (https.begin(client, "https://api.twelvedata.com/price?symbol=AMD,NOC,PLTR,LMT&dp=2&apikey=9d5aabf6c0224949b69be96a2a53ab93")) {
 
         // Serial.print("[HTTPS] GET...\n");
         // Start connection and send HTTP header

@@ -24,25 +24,26 @@ unsigned long currentMillis;
 short delnica = 1;
 
 String del1 = "AMD";
-String del2 = "GD";
+String del2 = "NOC";
 String del3 = "PLTR";
 String del4 = "LMT";
 
-float val1 = 168.40;// when 23.1.2024 market closed
-float val2 = 249.34;
-float val3 = 17.34;
-float val4 = 439.49;
+float val1 = 180.33;// when 23.1.2024 market closed
+float val2 = 434.55;
+float val3 = 16.64;
+float val4 = 431.04;
 
-float prev_val1 = 168.40;
-float prev_val2 = 249.34;
-float prev_val3 = 17.34;
-float prev_val4 = 439.49;
+float prev_val1 = 180.33;
+float prev_val2 = 434.55;
+float prev_val3 = 16.64;
+float prev_val4 = 431.04;
+
+float fval1 = 180.33; 
+float fval2 = 434.55;
+float fval3 = 16.64;
+float fval4 = 431.04;
 
 boolean day_start = true;
-float fval1 = 168.40; 
-float fval2 = 249.34;
-float fval3 = 17.34;
-float fval4 = 439.49;
 
 float daily_change_perc = 0.0;
 
@@ -211,9 +212,9 @@ void lcd_display(){
     case 2:
       lcd.setCursor(0,0);
       lcd.print(del2);
-      lcd.setCursor(3,0);
+      lcd.setCursor(4,0);
       lcd.print(val2);
-      lcd.setCursor(9,0);
+      lcd.setCursor(10,0);
       lcd.print("$");
 
       daily_change_perc = ((val2 - fval2)/fval2)*100;
